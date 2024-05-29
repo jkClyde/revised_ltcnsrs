@@ -11,6 +11,7 @@ import keyMapping from './functions/key_mapping';
 import { swapDayMonth, mapGender, mapPT, formatDateToYYYYMMDD } from './functions/functions';
 import { calculateAgeInMonths } from 'pages/form/Data/Calculations/calculateAgeInMonths';
 import { lengthForAgeStatus, weightForAgeStatus, weigthForLengthStatus } from 'pages/form/Data/Calculations';
+import databaseURL from 'database_url';
 
 function MyDataGrid() {
   const [filteredData, setFilteredData] = useState([]);
@@ -28,7 +29,6 @@ function MyDataGrid() {
       const data = await fetchChildData();
       setChildData(data);
       setFilteredData(data);
-      console.log(filteredData);
     };
     fetchData();
   }, []);
@@ -57,7 +57,14 @@ function MyDataGrid() {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const line7Value = sheet['A7'].v;
-      const barangayName = line7Value.length > 1 ? line7Value[1].trim() : '';
+      // const barangayName = line7Value.length > 1 ? line7Value[1].trim() : '';
+      let barangayName = '';
+      const parts = line7Value.split(' ');
+
+      if (parts.length >= 2) {
+        barangayName = parts.slice(1).join(' ').trim();
+      }
+
       const formattedBarangayName = barangayName.charAt(0).toUpperCase() + barangayName.slice(1).toLowerCase();
       const barangayJSON = {
         barangay: formattedBarangayName
@@ -109,25 +116,24 @@ function MyDataGrid() {
         return transformedItem;
       });
 
-      const promises = transformedData.map((item) => {
-        return fetch('http://127.0.0.1:8000/child/add-child/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(item)
-        })
-          .then((response) => {
-            if (response.ok) {
-              setSuccessCount((prevCount) => prevCount + 1);
-            } else {
-              setFailCount((prevCount) => prevCount + 1);
-            }
-          })
-          .catch((error) => {
-            console.error('Error sending data:', error);
-            setFailCount((prevCount) => prevCount + 1);
+      const promises = transformedData.map(async (item) => {
+        try {
+          const response = await fetch(`${databaseURL}/child/add-child/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(item)
           });
+          if (response.ok) {
+            setSuccessCount((prevCount) => prevCount + 1);
+          } else {
+            setFailCount((prevCount_1) => prevCount_1 + 1);
+          }
+        } catch (error) {
+          console.error('Error sending data:', error);
+          setFailCount((prevCount_2) => prevCount_2 + 1);
+        }
       });
       Promise.all(promises).then(() => {});
     };
@@ -216,7 +222,7 @@ function MyDataGrid() {
         rows={filteredData}
         columns={columns}
         sx={{ height: '65vh' }}
-        onRowClick={(params, event) => handleRowClick(params, event)}
+        // onRowClick={(params, event) => handleRowClick(params, event)}
         components={{
           Toolbar: () => (
             <div>

@@ -6,7 +6,8 @@ import {
   BgColorsOutlined,
   FontSizeOutlined,
   LoadingOutlined,
-  CalendarOutlined
+  CalendarOutlined,
+  UserOutlined // Added user icon
 } from '@ant-design/icons';
 
 // icons
@@ -17,7 +18,8 @@ const icons = {
   AntDesignOutlined,
   LoadingOutlined,
   AppstoreAddOutlined,
-  CalendarOutlined
+  CalendarOutlined,
+  UserOutlined
 };
 
 // ==============================|| MENU ITEMS - UTILITIES ||============================== //
@@ -63,6 +65,14 @@ const utilities = {
       type: 'item',
       url: '/calendar',
       icon: icons.CalendarOutlined,
+      breadcrumbs: false
+    },
+    {
+      id: 'user',
+      title: 'User',
+      type: 'item',
+      url: '/users',
+      icon: icons.UserOutlined, // Added user icon
       breadcrumbs: false
     }
   ]

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { connect } from 'react-redux';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -14,15 +15,36 @@ import Breadcrumbs from 'components/@extended/Breadcrumbs';
 
 // types
 import { openDrawer } from 'store/reducers/menu';
+import { checkAuthenticated, load_user } from 'store/actions/auth';
+import { useNavigate } from 'react-router-dom';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
-const MainLayout = () => {
+const MainLayout = (props) => {
+  const { checkAuthenticated, load_user } = props; // Destructure the functions from props
   const theme = useTheme();
   const matchDownLG = useMediaQuery(theme.breakpoints.down('lg'));
   const dispatch = useDispatch();
 
   const { drawerOpen } = useSelector((state) => state.menu);
+
+  const navigate = useNavigate();
+  // if (!access_token) {
+  //   navigate('/login');
+  // }
+
+  if (!localStorage.getItem('access')) {
+    navigate('/login');
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await checkAuthenticated();
+      await load_user();
+    };
+
+    fetchData();
+  }, [checkAuthenticated, load_user]);
 
   // drawer toggler
   const [open, setOpen] = useState(drawerOpen);
@@ -57,4 +79,9 @@ const MainLayout = () => {
   );
 };
 
-export default MainLayout;
+const mapStateToProps = (state) => ({
+  isAuthenticated: state.auth.isAuthenticated,
+  access_token: state.auth.access
+});
+
+export default connect(mapStateToProps, { checkAuthenticated, load_user })(MainLayout);

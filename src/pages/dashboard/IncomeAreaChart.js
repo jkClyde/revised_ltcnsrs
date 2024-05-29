@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles';
 
 // third-party
 import ReactApexChart from 'react-apexcharts';
+import Statistics from 'components/Statistics';
 
 // chart options
 const areaChartOptions = {
@@ -32,6 +33,7 @@ const areaChartOptions = {
 
 const IncomeAreaChart = ({ slot }) => {
   const theme = useTheme();
+  const statsData = Statistics();
 
   const { primary, secondary } = theme.palette.text;
   const line = theme.palette.divider;
@@ -41,11 +43,29 @@ const IncomeAreaChart = ({ slot }) => {
   useEffect(() => {
     setOptions((prevState) => ({
       ...prevState,
-      colors: [theme.palette.primary.main, theme.palette.primary[700]],
+      // theme.palette.primary[600]
+      colors: ['#ff0000', '#ffcccc', ' #2ecc71', '#FFFF00'],
       xaxis: {
         categories:
-          slot === 'month'
-            ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+          slot === 'month' || slot === 'week' || slot === 'day'
+            ? [
+                'Alno',
+                'Alapang',
+                'Pico',
+                'Wangal',
+                'Cruz',
+                'Poblacion',
+                'Puguis',
+                'Ambiong',
+                'Balili',
+                'Bahong',
+                'Beckel',
+                'Bineng',
+                'Betag',
+                'Lubas',
+                'Shilan',
+                'Tawang'
+              ]
             : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         labels: {
           style: {
@@ -69,7 +89,7 @@ const IncomeAreaChart = ({ slot }) => {
           show: true,
           color: line
         },
-        tickAmount: slot === 'month' ? 11 : 7
+        tickAmount: slot === 'month' ? 15 : 15
       },
       yaxis: {
         labels: {
@@ -89,27 +109,46 @@ const IncomeAreaChart = ({ slot }) => {
 
   const [series, setSeries] = useState([
     {
-      name: 'Page Views',
-      data: [0, 86, 28, 115, 48, 210, 136]
+      name: 'Severely underweight',
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     },
     {
-      name: 'Sessions',
-      data: [0, 43, 14, 56, 24, 105, 68]
+      name: 'Underweight',
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    {
+      name: 'Normal',
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    {
+      name: 'Overweight',
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }
   ]);
 
   useEffect(() => {
     setSeries([
       {
-        name: 'Page Views',
-        data: slot === 'month' ? [76, 85, 101, 98, 87, 105, 91, 114, 94, 86, 115, 35] : [31, 40, 28, 51, 42, 109, 100]
+        name: 'Severely underweight',
+        data:
+          slot === 'month' ? statsData.data_wfa_severe : slot === 'day' ? statsData.data_wfl_severe_and_wasted : statsData.data_lfa_severe
+      },
+
+      {
+        name: slot === 'day' ? 'obese' : 'Underweight',
+        data: slot === 'month' ? statsData.data_wfa_underweight : slot === 'day' ? statsData.data_wfl_obese : statsData.data_lfa_underweight
       },
       {
-        name: 'Sessions',
-        data: slot === 'month' ? [110, 60, 150, 35, 60, 36, 26, 45, 65, 52, 53, 41] : [11, 32, 45, 32, 34, 52, 41]
+        name: 'Normal',
+        data: slot === 'month' ? statsData.data_wfa_normal : slot === 'day' ? statsData.data_wfa_normal : statsData.data_lfa_normal
+      },
+      {
+        name: 'Overweight',
+        data:
+          slot === 'month' ? statsData.data_wfa_overweight : slot === 'day' ? statsData.data_wfl_overweight : statsData.data_lfa_overweight
       }
     ]);
-  }, [slot]);
+  }, [slot, statsData.data_wfa_severe, statsData.data_wfa_underweight, statsData.data_wfa_normal, statsData.data_wfa_overweight]);
 
   return <ReactApexChart options={options} series={series} type="area" height={450} />;
 };

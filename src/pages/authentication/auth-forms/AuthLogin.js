@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react'; // Import React and useState
 import { Link as RouterLink } from 'react-router-dom';
+import { useDispatch } from 'react-redux'; // Assuming you're using Redux for state management
+import { connect } from 'react-redux';
 
 // material-ui
 import {
   Button,
   Checkbox,
-  Divider,
+  // Divider,
   FormControlLabel,
   FormHelperText,
   Grid,
@@ -22,8 +24,12 @@ import {
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 
+//FUNCTIONS
+import { useNavigate } from 'react-router-dom';
+import { login } from 'store/actions/auth';
+
 // project import
-import FirebaseSocial from './FirebaseSocial';
+// import FirebaseSocial from './FirebaseSocial';
 import AnimateButton from 'components/@extended/AnimateButton';
 
 // assets
@@ -32,7 +38,25 @@ import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const AuthLogin = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log('it should be removed here');
+    localStorage.removeItem('access');
+  }, []);
+
+  // useEffect(() => {
+  //   if (access_token) {
+  //     navigate('/');
+  //   }
+  // }, [access_token, navigate]);
+
+  if (localStorage.getItem('access')) {
+    navigate('/dashboard');
+  }
+
   const [checked, setChecked] = React.useState(false);
+  const dispatch = useDispatch(); // Extract dispatch function
 
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
@@ -47,18 +71,21 @@ const AuthLogin = () => {
     <>
       <Formik
         initialValues={{
-          email: 'info@codedthemes.com',
-          password: '123456',
+          email: '',
+          password: '',
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-          password: Yup.string().max(255).required('Password is required')
+          email: Yup.string().email('Must be a valid email').max(255).required('Email is required')
+          // password: Yup.string().max(255).required('Password is required')
         })}
-        onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+        onSubmit={(values, { setErrors, setStatus, setSubmitting }) => {
           try {
+            dispatch(login(values.email, values.password));
+
             setStatus({ success: false });
             setSubmitting(false);
+            setStatus({ success: true });
           } catch (err) {
             setStatus({ success: false });
             setErrors({ submit: err.message });
@@ -156,14 +183,6 @@ const AuthLogin = () => {
                   </Button>
                 </AnimateButton>
               </Grid>
-              <Grid item xs={12}>
-                <Divider>
-                  <Typography variant="caption"> Login with</Typography>
-                </Divider>
-              </Grid>
-              <Grid item xs={12}>
-                <FirebaseSocial />
-              </Grid>
             </Grid>
           </form>
         )}
@@ -172,4 +191,8 @@ const AuthLogin = () => {
   );
 };
 
-export default AuthLogin;
+const mapStateToProps = (state) => ({
+  access_token: state.auth.access
+});
+
+export default connect(mapStateToProps)(AuthLogin);

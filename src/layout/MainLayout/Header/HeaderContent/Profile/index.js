@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -28,6 +28,11 @@ import SettingTab from './SettingTab';
 // assets
 import avatar1 from 'assets/images/users/avatar-1.png';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+//my imports
+import databaseURL from 'database_url';
+import { connect } from 'react-redux';
+import { logout } from 'store/actions/auth';
+import { useDispatch } from 'react-redux'; // Import useDispatch hook
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -53,11 +58,43 @@ function a11yProps(index) {
 
 // ==============================|| HEADER CONTENT - PROFILE ||============================== //
 
-const Profile = () => {
+const Profile = ({ access_token }) => {
   const theme = useTheme();
+  const dispatch = useDispatch(); // Initialize useDispatch hook
 
   const handleLogout = async () => {
-    // logout
+    dispatch(logout()); // Dispatch the logout action
+  };
+
+  const [user, setUser] = useState({
+    first_name: '',
+    last_name: '',
+    job_description: '',
+    barangay: '',
+    email: '',
+    phone_number: ''
+  });
+
+  useEffect(() => {
+    if (access_token) {
+      fetchUserData();
+    }
+  }, [access_token]);
+
+  const fetchUserData = () => {
+    fetch(`${databaseURL}/auth/users/me/`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${access_token}`
+      }
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setUser(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching user data:', error);
+      });
   };
 
   const anchorRef = useRef(null);
@@ -97,8 +134,10 @@ const Profile = () => {
         onClick={handleToggle}
       >
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
-          <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
-          <Typography variant="subtitle1">John Doe</Typography>
+          {/* <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} /> */}
+          <Typography variant="subtitle1">
+            {user.first_name} {user.last_name}
+          </Typography>
         </Stack>
       </ButtonBase>
       <Popper
@@ -139,11 +178,11 @@ const Profile = () => {
                       <Grid container justifyContent="space-between" alignItems="center">
                         <Grid item>
                           <Stack direction="row" spacing={1.25} alignItems="center">
-                            <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
+                            {/* <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} /> */}
                             <Stack>
-                              <Typography variant="h6">John Doe</Typography>
+                              <Typography variant="h6">Admin Clyde</Typography>
                               <Typography variant="body2" color="textSecondary">
-                                UI/UX Designer
+                                Web Developer
                               </Typography>
                             </Stack>
                           </Stack>
@@ -155,7 +194,7 @@ const Profile = () => {
                         </Grid>
                       </Grid>
                     </CardContent>
-                    {open && (
+                    {/* {open && (
                       <>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                           <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
@@ -192,7 +231,7 @@ const Profile = () => {
                           <SettingTab />
                         </TabPanel>
                       </>
-                    )}
+                    )} */}
                   </MainCard>
                 </ClickAwayListener>
               </Paper>
@@ -204,4 +243,8 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+const mapStateToProps = (state) => ({
+  access_token: state.auth.access
+});
+
+export default connect(mapStateToProps, {})(Profile);

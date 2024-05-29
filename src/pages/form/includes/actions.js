@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { lengthForAgeStatus, weightForAgeStatus, weigthForLengthStatus, calculateAgeInMonths } from '../Data/Calculations';
+import databaseURL from 'database_url';
 
 // Handle submit button click
 export const addChild = async (formData, setSuccess) => {
@@ -24,10 +25,9 @@ export const addChild = async (formData, setSuccess) => {
     data['aim'] = aim;
 
     // Log the data object to the console
-    console.log(data);
 
     // Send POST request
-    const response = await axios.post('http://127.0.0.1:8000/child/add-child/', data);
+    const response = await axios.post(`${databaseURL}/child/add-child/`, data);
 
     // Handle successful response
     console.log('Response:', response.data);

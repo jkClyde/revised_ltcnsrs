@@ -11,7 +11,8 @@ export const columns = [
     flex: 5,
     renderCell: (params) => (
       <div style={{ overflowWrap: 'break-word' }}>
-        {`${params.row.last_name || ''}, ${params.row.first_name || ''} ${params.row.middle_name || ''}`}
+        {/* {`${params.row.last_name || ''}, ${params.row.first_name || ''} ${params.row.middle_name || ''}`} */}
+        hidden
       </div>
     ),
     headerAlign: 'center',
@@ -200,7 +201,7 @@ export const columns = [
         }
         onClick={(e) => {
           e.stopPropagation(); // Stop the event from propagating to the row
-          handleProfileButtonClick(params.row);
+          // handleProfileButtonClick(params.row);
         }}
       >
         <VisibilityIcon />
@@ -214,7 +215,11 @@ export const columns = [
     headerAlign: 'center',
     flex: 1,
     renderCell: (params) => (
-      <IconButton variant="outlined" color="error" onClick={() => handleDeleteRow(params.row.id)}>
+      <IconButton
+        variant="outlined"
+        color="error"
+        // onClick={() => handleDeleteRow(params.row.id)}
+      >
         <DeleteIcon />
       </IconButton>
     ),

@@ -17,6 +17,8 @@ const Forms = Loadable(lazy(() => import('pages/form')));
 const Database = Loadable(lazy(() => import('pages/table')));
 const Calendar = Loadable(lazy(() => import('pages/calendar/Calendar')));
 const Import = Loadable(lazy(() => import('pages/import/index.js')));
+const Profile = Loadable(lazy(() => import('pages/profile/index')));
+const Users = Loadable(lazy(() => import('pages/users/index')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -26,6 +28,14 @@ const MainRoutes = {
   children: [
     {
       path: '/',
+      element: <DashboardDefault />
+    },
+    {
+      path: '/dashboard',
+      element: <DashboardDefault />
+    },
+    {
+      path: '/free',
       element: <DashboardDefault />
     },
     {
@@ -69,6 +79,14 @@ const MainRoutes = {
     {
       path: 'import',
       element: <Import />
+    },
+    {
+      path: 'profile',
+      element: <Profile />
+    },
+    {
+      path: 'users',
+      element: <Users />
     }
   ]
 };

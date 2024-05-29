@@ -81,6 +81,7 @@ def save_child_information(request):
             'gender': json_data.get('gender'),
             'birth_weight': json_data.get('birth_weight'),
             'birth_order': json_data.get('birth_order'),
+            'barangay' : json_data.get('barangay')
         }
 
         # Update the 'archieved' field based on the 'aim' value
@@ -151,80 +152,13 @@ def save_child_information(request):
 
 
 
-def get_all_child_information(request):
-    if request.method == 'GET':
-        children = ChildInformation.objects.all()
-        child_data = []
-
-        for child in children:
-            child_info = {
-                'child': {
-                    'first_name': child.first_name,
-                    'last_name': child.last_name,
-                    'middle_name': child.middle_name,
-                    'suffix': child.suffix,
-                    'date_of_birth': child.date_of_birth,
-                    'gender': child.gender,
-                    'birth_weight': child.birth_weight,
-                    'birth_order': child.birth_order,
-                    'aim': child.aim
-                },
-                'parent': {
-                    'father_first_name': child.parent.father_first_name,
-                    'father_last_name': child.parent.father_last_name,
-                    'father_middle_name': child.parent.father_middle_name,
-                    'father_suffix': child.parent.father_suffix,
-                    'father_age': child.parent.father_age,
-                    'father_ethnicity': child.parent.father_ethnicity,
-                    'father_occupation': child.parent.father_occupation,
-                    'father_religion': child.parent.father_religion,
-                    'father_contact_number': child.parent.father_contact_number,
-
-                    'mother_first_name': child.parent.mother_first_name,
-                    'mother_last_name': child.parent.mother_last_name,
-                    'mother_middle_name': child.parent.mother_middle_name,
-                    'mother_suffix': child.parent.mother_suffix,
-                    'mother_age': child.parent.mother_age,
-                    'mother_ethnicity': child.parent.mother_ethnicity,
-                    'mother_occupation': child.parent.mother_occupation,
-                    'mother_religion': child.parent.mother_religion,
-                    'mother_contact_number': child.parent.mother_contact_number,
-
-                    'guardian_first_name': child.parent.guardian_first_name,
-                    'guardian_last_name': child.parent.guardian_last_name,
-                    'guardian_middle_name': child.parent.guardian_middle_name,
-                    'guardian_suffix': child.parent.guardian_suffix,
-                    'guardian_age': child.parent.guardian_age,
-                    'guardian_ethnicity': child.parent.guardian_ethnicity,
-                    'guardian_occupation': child.parent.guardian_occupation,
-                    'guardian_religion': child.parent.guardian_religion,
-                    'guardian_contact_number': child.parent.guardian_contact_number
-                },
-                'child_health': {
-                    'date_of_weighing': child.childhealthinformation.date_of_weighing,
-                    'weight': child.childhealthinformation.weight,
-                    'height': child.childhealthinformation.height,
-                    'muac': child.childhealthinformation.muac,
-                    'bpe': child.childhealthinformation.bpe,
-                    'wfa': child.childhealthinformation.wfa,
-                    'lfa': child.childhealthinformation.lfa,
-                    'wfl': child.childhealthinformation.wfl
-                }
-            }
-            child_data.append(child_info)
-
-        return JsonResponse({'children': child_data})
-    else:
-        return JsonResponse({'error': 'Invalid request method.'})
-
-
-
-
 
 def get_all_child_information(request):
     if request.method == 'GET':
         children = ChildInformation.objects.all()
         child_data = []
+        total_children = ChildInformation.objects.filter(is_archieved=False).count()
+
 
         for child in children:
             child_info = {
@@ -239,6 +173,8 @@ def get_all_child_information(request):
                 'birth_order': child.birth_order,
                 'aim': child.aim,
                 'is_archieved': child.is_archieved,
+                'barangay' : child.barangay,
+
                 'parent': {},
                 'child_health': {}
             }
@@ -294,6 +230,10 @@ def get_all_child_information(request):
 
             child_data.append(child_info)
 
-        return JsonResponse({'children': child_data})
+        response_data = {
+            'children': child_data
+        }
+
+        return JsonResponse(response_data)
     else:
         return JsonResponse({'error': 'Invalid request method.'})

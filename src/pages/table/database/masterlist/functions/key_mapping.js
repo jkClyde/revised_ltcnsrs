@@ -13,7 +13,7 @@ const keyMapping = {
   WT: 'weight',
   ADDRESS: 'address',
   AIM: 'aim',
-  barangay: 'barangay',
+  "barangay": 'barangay',
 
   //Poblacion
   __EMPTY_1: 'fullName',
